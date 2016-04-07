@@ -7,20 +7,22 @@ $stdout.sync = true
 
 run Proc.new { |env|
   kb = 1024
-  env_size = 64 * kb
+  kb_32 = 32*kb
+  i = 1
+  env_hash = {i.to_s => "v" * kb_32}
 
   loop do
-    puts "Spawning echo with env value size of #{env_size} bytes"
+    puts "Spawning echo with env value size of #{env_hash.to_json.bytesize} bytes"
     pid = fork do
 
       begin
         exec(
-          {"key" => "v" * env_size },
+          env_hash,
           "echo",
           "hello world"
         )
       rescue => e
-        puts "Hit an error with spawn with a env size of #{env_size}"
+        puts "Hit an error with spawn with a env size of #{env_hash.to_json.bytesize}"
         puts e.class.to_s
         puts e.message
         exit 123
@@ -33,9 +35,11 @@ run Proc.new { |env|
       puts "Subprocess failed with #$?"
       break
     end
-    env_size += kb
+    i += 1
+    env_hash.merge!({i.to_s => "v" * kb_32})
+
     $stdout.flush
   end
 
-  [200, {}, [{env_size_kb: env_size/kb.to_f}.to_json]]
+  [200, {}, [{env_size_kb: env_hash.to_json.bytesize/kb.to_f}.to_json]]
 }
