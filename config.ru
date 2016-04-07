@@ -11,16 +11,20 @@ run Proc.new { |env|
   loop do
     begin
       puts "Spawning echo with env value size of #{env_size} bytes"
-      res = POSIX::Spawn::system(
-        {"key" => "v" * env_size },
-        "echo",
-        "hello world"
-      )
-
-      unless res
-        puts "Got an error: #$?"
-        break
+      pid = fork do
+        exec(
+          {"key" => "v" * env_size },
+          "echo",
+          "hello world"
+        )
       end
+
+      Process.waitpid(pid)
+
+      # unless 
+      #   puts "Got an error: #$?"
+      #   break
+      # end
       env_size *= 2
       $stdout.flush
     rescue => e
