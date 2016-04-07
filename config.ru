@@ -6,7 +6,8 @@ puts File.read("/proc/#$$/limits")
 $stdout.sync = true
 
 run Proc.new { |env|
-  env_size = 32 * 1024
+  kb = 1024
+  env_size = 64 * kb
 
   loop do
     puts "Spawning echo with env value size of #{env_size} bytes"
@@ -32,9 +33,9 @@ run Proc.new { |env|
       puts "Subprocess failed with #$?"
       break
     end
-    env_size *= 2
+    env_size += kb
     $stdout.flush
   end
 
-  [200, {}, [{env_size: env_size}.to_json]]
+  [200, {}, [{env_size_kb: env_size/kb.to_f}.to_json]]
 }
