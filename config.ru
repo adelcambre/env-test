@@ -17,6 +17,7 @@ run Proc.new { |env|
       puts "Hit an error with spawn with a env size of #{env_size}"
       puts e.class.to_s
       puts e.message
+      break
     end
   end
 
