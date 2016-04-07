@@ -1,6 +1,8 @@
 require 'posix-spawn'
 require 'json'
 
+puts File.read("/proc/#$$/limits")
+
 $stdout.sync = true
 
 run Proc.new { |env|
